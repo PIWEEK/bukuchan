@@ -10,7 +10,6 @@ import {
 
 import type { Route } from "./+types/root";
 
-import { BookHeart } from "lucide-react";
 import "./app.css";
 
 export const links: Route.LinksFunction = () => [
@@ -53,17 +52,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 export default function App() {
   return (
     <div className="grid grid-rows-[auto_1fr_auto] h-full py-6">
-      <header className="px-6 text-center border-b-2 border-base-100 dark:border-base-800 pb-4">
-        <p className="text-xl font-black tracking-wider uppercase">
-          <Link to="/" className="flex items-center gap-1 justify-center">
-            <BookHeart />
-            Bukuchan
-          </Link>
-        </p>
-      </header>
-      <main className="h-full py-6 px-6 container mx-auto">
-        <Outlet />
-      </main>
+      <Outlet />
       <footer className="px-6 text-center">
         <p>
           Made with love by Alonso and Belén |{" "}
@@ -83,7 +72,6 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   if (isRouteErrorResponse(error)) {
     code = error.status;
     message = error.statusText;
-    // message = error.status === 404 ? "Page not found" : "Error";
     details =
       error.status === 404
         ? "Oops! This is not the page you are looking for."

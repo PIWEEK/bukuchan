@@ -3,7 +3,7 @@ import { redirect, Form } from "react-router";
 import { BookHeart } from "lucide-react";
 
 import { Heading, TextInput, Button, Message } from "~/ui";
-import { verifyUser, createToken } from "~/.server/auth";
+import { verifyUser } from "~/.server/auth";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -21,14 +21,10 @@ export async function action({ request }: Route.ActionArgs) {
     return { error: "User and password are required" };
   }
 
-  const user = await verifyUser(userId, password);
-  if (!user) {
+  const token = await verifyUser(userId, password);
+  if (!token) {
     return { error: "Invalid user or password" };
   }
-
-  const token = createToken(user);
-
-  console.log("User logged in:", user.id);
 
   return redirect("/dashboard", {
     headers: {
