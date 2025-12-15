@@ -1,4 +1,4 @@
-import type { Route } from "./+types/write";
+import type { Route } from "./+types/dashboard";
 import Heading from "~/ui/heading";
 
 export function meta({}: Route.MetaArgs) {
@@ -8,7 +8,7 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 
-export default function Write() {
+export default function Dashboard() {
   return (
     <article>
       <Heading>Welcome back!</Heading>
