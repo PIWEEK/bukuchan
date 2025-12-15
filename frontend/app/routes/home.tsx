@@ -9,10 +9,8 @@ export function meta({}: Route.MetaArgs) {
 
 export default function Home() {
   return (
-    <main className="h-full py-6 px-6">
-      <h1 className="text-4xl font-bold">
-        <a href="/">Bukuchan</a>
-      </h1>
-    </main>
+    <>
+      <h1>Home</h1>
+    </>
   );
 }
