@@ -1,5 +1,6 @@
 import type { Route } from "./+types/home";
-import LoginForm from "~/components/login-form";
+import { Link } from "react-router";
+import Heading from "~/ui/heading";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -10,8 +11,11 @@ export function meta({}: Route.MetaArgs) {
 
 export default function Home() {
   return (
-    <>
-      <LoginForm />
-    </>
+    <article className="h-full">
+      <Heading className="my-6 text-center">Hola!</Heading>
+      <p className="text-center text-xl">
+        <Link to="/login">Login</Link>
+      </p>
+    </article>
   );
 }
