@@ -1,8 +1,8 @@
 import type { Route } from "./+types/login";
 import { redirect, Form } from "react-router";
+import { BookHeart } from "lucide-react";
 
 import { Heading, TextInput, Button, Message } from "~/ui";
-
 import { verifyUser, createToken } from "~/.server/auth";
 
 export function meta({}: Route.MetaArgs) {
@@ -42,10 +42,14 @@ export default function Login({ actionData }: Route.ComponentProps) {
 
   return (
     <section className="max-w-md mx-auto grid place-content-center h-full">
+      <BookHeart
+        strokeWidth={1.0}
+        className="w-64 h-64 text-center mx-auto py-6"
+      />
       <Heading className="text-center">Login</Heading>
 
       <Form method="post" action="/login" className="pt-8 grid gap-6 w-md">
-        {error && <Message>{error}</Message>}
+        {error && <Message level="error">{error}</Message>}
 
         <TextInput
           label="User"
