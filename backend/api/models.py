@@ -15,17 +15,39 @@ class Node(models.Model):
     def __str__(self):
         return self.name
 
+    def as_child(self):
+        if hasattr(self, "nodegroup"):
+            return self.nodegroup
+        if hasattr(self, "textnode"):
+            if hasattr(self.textnode, "scene"):
+                return self.textnode.scene
+            if hasattr(self.textnode, "loreentity"):
+                return self.textnode.loreentity
+        return self
+
+    def get_node_type(self):
+        if hasattr(self, "nodegroup"):
+            return "node-group"
+        if hasattr(self, "textnode"):
+            if hasattr(self.textnode, "scene"):
+                return "scene"
+            if hasattr(self.textnode, "loreentity"):
+                return "lore-entity"
+        return self
+
 class ProjectNode(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    node = models.ForeignKey(Node, on_delete=models.CASCADE) 
+    node = models.ForeignKey(Node, on_delete=models.CASCADE)
+    order = models.IntegerField(default=0)
 
+# Base class for text nodes
 class TextNode(Node):
     text = models.TextField()
 
-class Scene(Node):
+class Scene(TextNode):
     pass
 
-class LoreEntity(Node):
+class LoreEntity(TextNode):
     entity_name = models.CharField(max_length=255)
 
 class NodeGroup(Node):
@@ -33,7 +55,8 @@ class NodeGroup(Node):
 
 class NodeGroupChild(models.Model):
     group = models.ForeignKey(NodeGroup, on_delete=models.CASCADE, related_name='node_group_parent')
-    child = models.ForeignKey(Node, on_delete=models.CASCADE) 
+    child = models.ForeignKey(Node, on_delete=models.CASCADE)
+    order = models.IntegerField(default=0)
     
 class Settings(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)

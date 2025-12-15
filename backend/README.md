@@ -25,7 +25,14 @@ pip install -r requirements.txt
 python manage.py migrate
 ```
 
-4. Create a admin user (only if you want to access the admin)
+4. Now you can use as a black database or load the fixtures
+4.1. Load Fixtures
+
+```
+python manage.py loaddata fixtures
+```
+
+4.2. Create a admin user (only if you want to access the admin)
 
 ```
 python3 manage.py createsuperuser
