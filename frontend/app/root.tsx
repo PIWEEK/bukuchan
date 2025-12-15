@@ -8,6 +8,8 @@ import {
 } from "react-router";
 
 import type { Route } from "./+types/root";
+
+import { BookHeart } from "lucide-react";
 import "./app.css";
 
 // TODO: Uncomment this to use Google Fonts
@@ -48,7 +50,10 @@ export default function App() {
     <div className="grid grid-rows-[auto_1fr_auto] h-full py-6">
       <header className="px-6 text-center">
         <p className="text-xl font-bold uppercase">
-          <a href="/">Bukuchan</a>
+          <a href="/" className="flex items-center gap-1 justify-center">
+            <BookHeart />
+            Bukuchan
+          </a>
         </p>
       </header>
       <main className="h-full py-6 px-6 container mx-auto">
