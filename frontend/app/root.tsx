@@ -20,16 +20,16 @@ export const links: Route.LinksFunction = () => [
     type: "image/svg+xml",
   },
   // TODO: Uncomment this to use Google Fonts
-  //   { rel: "preconnect", href: "https://fonts.googleapis.com" },
-  //   {
-  //     rel: "preconnect",
-  //     href: "https://fonts.gstatic.com",
-  //     crossOrigin: "anonymous",
-  //   },
-  //   {
-  //     rel: "stylesheet",
-  //     href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
-  //   },
+  { rel: "preconnect", href: "https://fonts.googleapis.com" },
+  {
+    rel: "preconnect",
+    href: "https://fonts.gstatic.com",
+    crossOrigin: "anonymous",
+  },
+  {
+    rel: "stylesheet",
+    href: "https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&display=swap",
+  },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -53,8 +53,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
 export default function App() {
   return (
     <div className="grid grid-rows-[auto_1fr_auto] h-full py-6">
-      <header className="px-6 text-center border-b-2 border-base-100 pb-4">
-        <p className="text-xl font-bold uppercase">
+      <header className="px-6 text-center border-b-2 border-base-100 dark:border-base-800 pb-4">
+        <p className="text-xl font-black tracking-wider uppercase">
           <Link to="/" className="flex items-center gap-1 justify-center">
             <BookHeart />
             Bukuchan
