@@ -16,7 +16,7 @@ export default function TextInput({
       <Input
         placeholder={placeholder}
         type={type}
-        className="border-b-2 border-base-300 focus-visible:border-none focus-visible:rounded-md p-2 w-full outline-none ring-inset focus-visible:ring-2 focus-visible:ring-light-or"
+        className="border-b-2 border-base-300 focus-visible:border-light-or p-2 w-full outline-none"
       />
     </TextField>
   );
