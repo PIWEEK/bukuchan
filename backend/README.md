@@ -1,11 +1,12 @@
 # Setup steps
+
 1. Create VENV
 
 ```
 python -m venv venv
 ```
 
-2. Activate VENV
+2. Activate VENV (warning: this is necesary everytime you open the terminal)
 
 ```
 source venv/bin/activate
