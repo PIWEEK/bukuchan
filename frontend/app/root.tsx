@@ -1,5 +1,6 @@
 import {
   isRouteErrorResponse,
+  Link,
   Links,
   Meta,
   Outlet,
@@ -52,12 +53,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
 export default function App() {
   return (
     <div className="grid grid-rows-[auto_1fr_auto] h-full py-6">
-      <header className="px-6 text-center">
+      <header className="px-6 text-center border-b-2 border-base-100 pb-4">
         <p className="text-xl font-bold uppercase">
-          <a href="/" className="flex items-center gap-1 justify-center">
+          <Link to="/" className="flex items-center gap-1 justify-center">
             <BookHeart />
             Bukuchan
-          </a>
+          </Link>
         </p>
       </header>
       <main className="h-full py-6 px-6 container mx-auto">
