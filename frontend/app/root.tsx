@@ -44,7 +44,24 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return <Outlet />;
+  return (
+    <div className="grid grid-rows-[auto_1fr_auto] h-full py-6">
+      <header className="px-6 text-center">
+        <p className="text-xl font-bold uppercase">
+          <a href="/">Bukuchan</a>
+        </p>
+      </header>
+      <main className="h-full py-6 px-6 container mx-auto">
+        <Outlet />
+      </main>
+      <footer className="px-6 text-center">
+        <p>
+          Made with love by Alonso and Belén |{" "}
+          <a href="https://github.com/piweek/bukuchan">Github</a>
+        </p>
+      </footer>
+    </div>
+  );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
