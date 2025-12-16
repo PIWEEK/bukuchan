@@ -1,6 +1,6 @@
-import User from "~/core/user";
+import User, { type Token } from "~/core/user";
 import type AuthRepository from "~/core/auth-repository";
-import type { Token } from "~/core/auth-repository";
+import { UserApiRepository } from "./user";
 
 const BASE_ENDPOINT = "http://localhost:8000/api";
 
@@ -27,9 +27,9 @@ export class AuthApiRepository implements AuthRepository {
   }
 }
 
-export async function getUserFromSession(
+export async function getTokenFromSession(
   request: Request
-): Promise<User | null> {
+): Promise<Token | null> {
   const cookie = request.headers.get("Cookie");
   if (!cookie) {
     return null;
@@ -40,23 +40,23 @@ export async function getUserFromSession(
     .find((c) => c.trim().startsWith("token="))
     ?.split("=")[1];
 
+  return token ?? null;
+}
+
+export async function getUserFromSession(
+  request: Request
+): Promise<User | null> {
+  const token = await getTokenFromSession(request);
+
   if (!token) {
     return null;
   }
 
-  const user = verifyToken(token);
+  const userRepository = new UserApiRepository(token);
+  const user = await userRepository.get();
   if (!user) {
     return null;
   }
 
   return user;
-}
-
-export function verifyToken(token: string): User | null {
-  // FIXME: Implement token verification
-  if (token) {
-    return new User("benko");
-  }
-
-  return null;
 }
