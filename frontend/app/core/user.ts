@@ -1,7 +1,8 @@
+export type Token = string;
 export default class User {
-  id: string;
+  username: string;
 
-  constructor(id: string) {
-    this.id = id;
+  constructor(username: string) {
+    this.username = username;
   }
 }

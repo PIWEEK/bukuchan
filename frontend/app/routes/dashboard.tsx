@@ -39,7 +39,7 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
           </Link>
         </p>
         <p>
-          Logged in as <b>{user.id}</b>. <Link to="/logout">Logout</Link>
+          Logged in as <b>{user.username}</b>. <Link to="/logout">Logout</Link>
         </p>
       </header>
 
