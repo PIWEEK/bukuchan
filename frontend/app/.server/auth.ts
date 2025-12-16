@@ -1,5 +1,31 @@
-import { redirect } from "react-router";
 import User from "~/core/user";
+import type AuthRepository from "~/core/auth-repository";
+import type { Token } from "~/core/auth-repository";
+
+const BASE_ENDPOINT = "http://localhost:8000/api";
+
+export class AuthApiRepository implements AuthRepository {
+  async getToken(userId: string, password: string): Promise<Token | null> {
+    const response = await fetch(`${BASE_ENDPOINT}/auth`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ username: userId, password }),
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const data = await response.json();
+    if (!data?.token) {
+      return null;
+    }
+
+    return data.token;
+  }
+}
 
 export async function getUserFromSession(
   request: Request
@@ -26,36 +52,11 @@ export async function getUserFromSession(
   return user;
 }
 
-type Token = string;
-
-export async function verifyUser(
-  userId: string,
-  password: string
-): Promise<Token | null> {
-  // FIXME: Implement user verification
-  if (userId === "benko" && password === "1234test") {
-    const user = new User("benko");
-    return createToken(user);
-  }
-
-  return null;
-}
-
 export function verifyToken(token: string): User | null {
   // FIXME: Implement token verification
-  if (token === "1234") {
+  if (token) {
     return new User("benko");
   }
 
   return null;
-}
-
-function createToken(user: User): string {
-  // FIXME: Implement token creation
-
-  if (user.id === "benko") {
-    return "1234";
-  }
-
-  return "0000";
 }
