@@ -1,8 +1,8 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from .models import Project, ProjectNode
-from .serializers import ProjectBasicSerializer, ProjectDetailSerializer, ProjectNodeSerializer
+from .models import Project, ProjectNode, Node, NodeGroupChild
+from .serializers import ProjectBasicSerializer, ProjectDetailSerializer, ProjectNodeSerializer, NodeSerializer, NodeGroupChildSerializer
 from rest_framework.permissions import IsAuthenticated
 
 class ProjectsListView(APIView):
@@ -23,6 +23,7 @@ class ProjectsListView(APIView):
             serializer.save()
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
+    
 
 class ProjectsDetailView(APIView):
     permission_classes = [IsAuthenticated]
@@ -41,15 +42,119 @@ class ProjectsDetailView(APIView):
         
         return Response(result)
 
+    def delete(self, request, pk=None):
+        try:
+            project = Project.objects.get(id=pk)
+        except Project.DoesNotExist:
+            return Response("Not found", status=404)
+        
+        project.delete()
+        
+        return Response("OK", status=200)
+
 class NodesListView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, pk=None):
-        pass
+        try:
+            project = Project.objects.get(id=pk)
+        except Project.DoesNotExist:
+            return Response("Not found", status=404)
+        
+        nodes = project.projectnode_set.all()
+        result = ProjectNodeSerializer(nodes, many=True).data
+        return Response(result)
+
+    def post(self, request, pk=None):
+        try:
+            project = Project.objects.get(id=pk)
+        except Project.DoesNotExist:
+            return Response("Not found", status=404)
+
+        serializer = NodeSerializer().get_serializer(request.data)
+        serializer.is_valid(raise_exception=True)
+        new_node = serializer.save()
+        nodes = project.projectnode_set.all()
+
+        last_order=-1
+        for node in nodes:
+            if node.order > last_order:
+                last_order = node.order
+            
+        ProjectNode(project=project, node=new_node, order=last_order+1).save()
+
+        nodes = project.projectnode_set.all()
+        result = ProjectNodeSerializer(nodes, many=True).data
+        return Response(result)
 
 
 class NodeDetailView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, pk=None, node_pk=None):
+        try:
+            project = Project.objects.get(id=pk)
+        except Project.DoesNotExist:
+            return Response("Not found project", status=404)
+
+        try:
+            node = Node.objects.get(id=node_pk)
+        except Node.DoesNotExist:
+            return Response("Not found node", status=404)
+
+        return Response(NodeSerializer(node).data)
+
+    def delete(self, request, pk=None, node_pk=None):
+        try:
+            project = Project.objects.get(id=pk)
+        except Project.DoesNotExist:
+            return Response("Not found project", status=404)
+
+        try:
+            node = Node.objects.get(id=node_pk)
+        except Node.DoesNotExist:
+            return Response("Not found node", status=404)
+
+        node.delete()
+
+        return Response("OK", status=200)
+
+    def post(self, request, pk=None, node_pk=None):
+        try:
+            project = Project.objects.get(id=pk)
+        except Project.DoesNotExist:
+            return Response("Not found project", status=404)
+
+        try:
+            node = Node.objects.get(id=node_pk)
+        except Node.DoesNotExist:
+            return Response("Not found node", status=404)
+
+        if node.get_node_type() != 'node-group':
+            return Response("Only can add children to nodegroups", status=400)
+
+        serializer = NodeSerializer().get_serializer(request.data)
+        serializer.is_valid(raise_exception=True)
+        new_node = serializer.save()
+
+        node = node.as_child()
+        children = node.node_group_parent.all()
+        last_order=-1
+        for child in children:
+            if child.order > last_order:
+                last_order = node.order
+
+
+        NodeGroupChild(group=node, child=new_node, order=last_order).save()
+
+        children = node.node_group_parent.all()
+        result = NodeGroupChildSerializer(children, many=True).data
+        return Response(result)
+
+
+class NodeSetChildView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk=None, node_pk=None):
         pass
+

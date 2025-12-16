@@ -7,7 +7,9 @@ class UserSerializer(serializers.Serializer):
 
 class ProjectNodeSerializer(serializers.BaseSerializer):
     def to_representation(self, instance):
-        return NodeSerializer(instance=instance.node).data
+        data = NodeSerializer(instance=instance.node).data
+        data['order'] = instance.order
+        return data
 
 class ProjectBasicSerializer(serializers.ModelSerializer):
     class Meta:
@@ -25,7 +27,6 @@ class ProjectDetailSerializer(serializers.ModelSerializer):
 
 class NodeSerializer(serializers.BaseSerializer):
     def to_representation(self, instance):
-        print(instance.as_child().__class__)
         node = instance.as_child()
         
         if isinstance(node, Scene):
@@ -41,6 +42,21 @@ class NodeSerializer(serializers.BaseSerializer):
 
         return data
 
+    def get_serializer(self, data):
+        if data['type'] == 'scene':
+            return SceneSerializer(data=data)
+
+        elif data['type'] == 'nodegroup':
+            return NodeGroupSerializer(data=data)
+
+        elif data['type'] == 'loreentity':
+            return LoreEntitySerializer(data=data)
+
+        else:
+            raise serializers.ValidationError({
+                'type': 'Type is not valid'
+            })
+
 class SceneSerializer(serializers.ModelSerializer):
     class Meta:
         model = Scene
@@ -48,7 +64,7 @@ class SceneSerializer(serializers.ModelSerializer):
 
 class LoreEntitySerializer(serializers.ModelSerializer):
     class Meta:
-        model = Scene
+        model = LoreEntity
         fields = '__all__'
 
 class NodeGroupChildSerializer(serializers.BaseSerializer):
@@ -56,8 +72,7 @@ class NodeGroupChildSerializer(serializers.BaseSerializer):
         return NodeSerializer(instance.child).data
     
 class NodeGroupSerializer(serializers.ModelSerializer):
-    # node_group_parent = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
-    children = NodeGroupChildSerializer(many=True, source='node_group_parent')
+    children = NodeGroupChildSerializer(many=True, source='node_group_parent', read_only=True)
 
     class Meta:
         model = NodeGroup
