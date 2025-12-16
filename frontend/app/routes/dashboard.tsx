@@ -5,6 +5,8 @@ import { BookHeart } from "lucide-react";
 import { authMiddleware } from "~/middleware/auth";
 import { userContext } from "~/context";
 
+import { DocumentTree } from "~/ui";
+
 export function meta({}: Route.MetaArgs) {
   return [
     { title: "Bukuchan" },
@@ -40,9 +42,16 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
           Logged in as <b>{user.id}</b>. <Link to="/logout">Logout</Link>
         </p>
       </header>
-      <main className="h-full py-6 px-6 container mx-auto">
-        <Outlet />
-      </main>
+
+      <div className="flex">
+        <sidebar className="h-full py-6 px-6 ">
+          <DocumentTree></DocumentTree>
+        </sidebar>
+
+        <main className="h-full py-6 px-6 container mx-auto">
+          <Outlet />
+        </main>
+      </div>
     </>
   );
 }
