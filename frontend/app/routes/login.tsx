@@ -2,7 +2,7 @@ import type { Route } from "./+types/login";
 import { redirect, Form } from "react-router";
 import { BookHeart } from "lucide-react";
 
-import { Heading, TextInput, Button, Message } from "~/ui";
+import { Heading, TextInput, Button, Message, Container } from "~/ui";
 import { verifyUser } from "~/.server/auth";
 
 export function meta({}: Route.MetaArgs) {
@@ -37,7 +37,7 @@ export default function Login({ actionData }: Route.ComponentProps) {
   const error = actionData?.error;
 
   return (
-    <section className="max-w-md mx-auto grid place-content-center h-full">
+    <Container variant="center">
       <BookHeart
         strokeWidth={1.0}
         className="w-64 h-64 text-center mx-auto py-6"
@@ -64,6 +64,6 @@ export default function Login({ actionData }: Route.ComponentProps) {
         />
         <Button type="submit">Login</Button>
       </Form>
-    </section>
+    </Container>
   );
 }

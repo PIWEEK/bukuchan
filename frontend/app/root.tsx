@@ -92,6 +92,9 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
             <code>{stack}</code>
           </pre>
         )}
+        <p className="mt-6 text-lg">
+          <Link to="/">Go back to the Home page</Link>
+        </p>
       </article>
     </main>
   );
