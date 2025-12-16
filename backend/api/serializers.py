@@ -80,3 +80,6 @@ class NodeGroupSerializer(serializers.ModelSerializer):
         model = NodeGroup
         fields = '__all__'
     
+class ReparentSerializer(serializers.Serializer):
+    node = serializers.IntegerField()
+    order = serializers.IntegerField()
