@@ -3,7 +3,6 @@ import {
   index,
   route,
   layout,
-  prefix,
 } from "@react-router/dev/routes";
 
 export default [
@@ -14,6 +13,6 @@ export default [
   ]),
   route("dashboard", "routes/dashboard.tsx", [
     index("routes/dashboard/index.tsx"),
-    route("new-story", "routes/dashboard/new-story.tsx"),
+    route("stories/new", "routes/dashboard/new-story.tsx"),
   ]),
 ] satisfies RouteConfig;

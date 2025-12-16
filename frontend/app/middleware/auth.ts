@@ -1,4 +1,5 @@
-import { getUserFromSession } from "~/.server/auth";
+import { getSession } from "~/.server/auth";
+import { redirect } from "react-router";
 import { userContext } from "~/context";
 
 export const authMiddleware = async (
@@ -11,7 +12,8 @@ export const authMiddleware = async (
   },
   next: () => Promise<Response>
 ) => {
-  const user = await getUserFromSession(request);
-  context.set(userContext, user);
+  const session = await getSession(request);
+
+  context.set(userContext, session);
   return next();
 };

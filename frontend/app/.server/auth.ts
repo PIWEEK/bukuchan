@@ -43,9 +43,9 @@ export async function getTokenFromSession(
   return token ?? null;
 }
 
-export async function getUserFromSession(
+export async function getSession(
   request: Request
-): Promise<User | null> {
+): Promise<{ user: User; token: Token } | null> {
   const token = await getTokenFromSession(request);
 
   if (!token) {
@@ -58,5 +58,5 @@ export async function getUserFromSession(
     return null;
   }
 
-  return user;
+  return { user, token };
 }
