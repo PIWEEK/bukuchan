@@ -1,7 +1,8 @@
 import type { Route } from "./+types/home";
-import { Link } from "react-router";
+import { Link, redirect } from "react-router";
 import { BookHeart } from "lucide-react";
 
+import { getUserFromSession } from "~/.server/auth";
 import Heading from "~/ui/heading";
 
 export function meta({}: Route.MetaArgs) {
@@ -9,6 +10,16 @@ export function meta({}: Route.MetaArgs) {
     { title: "Bukuchan" },
     { name: "description", content: "Minimalist creative writing app" },
   ];
+}
+
+export async function loader({ request }: Route.LoaderArgs) {
+  const user = await getUserFromSession(request);
+
+  if (user) {
+    throw redirect("/dashboard");
+  }
+
+  return { user };
 }
 
 export default function Home() {

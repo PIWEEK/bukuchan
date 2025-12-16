@@ -1,4 +1,6 @@
-import { Button as AriaButton } from "react-aria-components";
+import { useCallback } from "react";
+import { useNavigate } from "react-router";
+import { Button as AriaButton, type PressEvent } from "react-aria-components";
 
 const variants = {
   primary: {
@@ -14,15 +16,32 @@ const variants = {
 export default function Button({
   children,
   variant = "primary",
+  to,
   ...other
 }: {
   children: React.ReactNode;
   variant?: keyof typeof variants;
+  to?: string;
 } & React.ComponentProps<typeof AriaButton>) {
   const { bgColor, textColor } = variants[variant];
+  const navigate = useNavigate();
+
+  const onPress = useCallback(
+    (event: PressEvent) => {
+      if (to) {
+        navigate(to);
+      }
+      other.onPress?.(event);
+    },
+    [to, navigate, other]
+  );
 
   return (
-    <AriaButton className={`${bgColor} ${textColor} rounded-md p-2`} {...other}>
+    <AriaButton
+      onPress={onPress}
+      className={`${bgColor} ${textColor} rounded-md p-2`}
+      {...other}
+    >
       {children}
     </AriaButton>
   );
