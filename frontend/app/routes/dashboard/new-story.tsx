@@ -18,11 +18,11 @@ export function meta({}: Route.MetaArgs) {
 export async function action({ request, context }: Route.ActionArgs) {
   const formData = await request.formData();
   const title = formData.get("title") as string;
-  // const user = context.get(userContext);
+  const user = context.get(userContext);
 
-  // if (!user) {
-  //   throw redirect("/login");
-  // }
+  if (!user) {
+    throw redirect("/login");
+  }
 
   if (!title) {
     return { error: "Title is required" };
@@ -32,15 +32,14 @@ export async function action({ request, context }: Route.ActionArgs) {
     return { error: "Title must be at least 3 characters long" };
   }
 
-  // const createStoryUseCase = new CreateStoryUseCase(new StoryApiRepository());
-  // const story = await createStoryUseCase.execute(title);
-  const story = null;
+  const createStoryUseCase = new CreateStoryUseCase(new StoryApiRepository());
+  const story = await createStoryUseCase.execute(user, title);
 
   if (!story) {
     return { error: "Failed to create story" };
   }
 
-  return redirect(`/dashboard`);
+  return redirect(`/dashboard/stories/${story.id}`);
 }
 
 export default function NewStory({ actionData }: Route.ComponentProps) {
