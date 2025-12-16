@@ -4,7 +4,6 @@ import { Form, redirect } from "react-router";
 import CreateStoryUseCase from "~/core/create-story-use-case";
 import { StoryApiRepository } from "~/.server/story";
 import { userContext } from "~/context";
-import type User from "~/core/user";
 
 import { Heading, TextInput, Button, Container, Message } from "~/ui";
 
@@ -18,11 +17,7 @@ export function meta({}: Route.MetaArgs) {
 export async function action({ request, context }: Route.ActionArgs) {
   const formData = await request.formData();
   const title = formData.get("title") as string;
-  const user = context.get(userContext);
-
-  if (!user) {
-    throw redirect("/login");
-  }
+  const session = context.get(userContext);
 
   if (!title) {
     return { error: "Title is required" };
@@ -32,8 +27,10 @@ export async function action({ request, context }: Route.ActionArgs) {
     return { error: "Title must be at least 3 characters long" };
   }
 
-  const createStoryUseCase = new CreateStoryUseCase(new StoryApiRepository());
-  const story = await createStoryUseCase.execute(user, title);
+  const createStoryUseCase = new CreateStoryUseCase(
+    new StoryApiRepository(session?.token ?? "")
+  );
+  const story = await createStoryUseCase.execute(title);
 
   if (!story) {
     return { error: "Failed to create story" };

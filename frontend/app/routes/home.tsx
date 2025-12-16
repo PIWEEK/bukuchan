@@ -2,7 +2,7 @@ import type { Route } from "./+types/home";
 import { Link, redirect } from "react-router";
 import { BookHeart } from "lucide-react";
 
-import { getUserFromSession } from "~/.server/auth";
+import { getSession } from "~/.server/auth";
 import Heading from "~/ui/heading";
 import { authMiddleware } from "~/middleware/auth";
 
@@ -16,7 +16,7 @@ export function meta({}: Route.MetaArgs) {
 export const middleware: Route.MiddlewareFunction[] = [authMiddleware];
 
 export async function loader({ request }: Route.LoaderArgs) {
-  const user = await getUserFromSession(request);
+  const user = await getSession(request);
 
   if (user) {
     throw redirect("/dashboard");

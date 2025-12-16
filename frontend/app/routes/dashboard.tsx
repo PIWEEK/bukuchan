@@ -17,13 +17,13 @@ export function meta({}: Route.MetaArgs) {
 export const middleware: Route.MiddlewareFunction[] = [authMiddleware];
 
 export async function loader({ context }: Route.LoaderArgs) {
-  const user = context.get(userContext);
+  const session = context.get(userContext);
 
-  if (!user) {
+  if (!session) {
     throw redirect("/login");
   }
 
-  return { user };
+  return { user: session.user };
 }
 
 export default function Dashboard({ loaderData }: Route.ComponentProps) {
