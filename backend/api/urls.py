@@ -1,8 +1,12 @@
 from django.urls import path
-from .views import ProjectsListView, ProjectsDetailView
+from .views import ProjectsListView, ProjectsDetailView, NodesListView, NodeDetailView
+from rest_framework.authtoken import views
 
 urlpatterns = [
-    path('projects/', ProjectsListView.as_view(), name='projects-list'),
+    path('auth', views.obtain_auth_token),
+    path('projects', ProjectsListView.as_view(), name='projects-list'),
     path('projects/<int:pk>', ProjectsDetailView.as_view(), name='projects-detail'),
+    path('projects/<int:pk>/nodes', NodesListView.as_view(), name='nodes-list'),
+    path('projects/<int:pk>/nodes/<int:node_pk>', NodeDetailView.as_view(), name='node-detail'),
 ]
 
