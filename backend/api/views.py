@@ -1,10 +1,36 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from .models import Project, ProjectNode, Node, NodeGroupChild
+from .models import Project, ProjectNode, Node, NodeGroupChild, NodeGroup
 from .serializers import ProjectBasicSerializer, ProjectDetailSerializer, ProjectNodeSerializer, NodeSerializer, NodeGroupChildSerializer, ReparentSerializer
 from rest_framework.permissions import IsAuthenticated
 
+
+def result_project_nodes(project):
+    nodes = project.projectnode_set.all().order_by('order')
+    result = ProjectNodeSerializer(nodes, many=True).data
+    return Response(result)
+
+def result_group_nodes(node):
+    children = node.node_group_parent.all().order_by('order')
+    result = NodeGroupChildSerializer(children, many=True).data
+    return Response(result)
+
+def fix_project_order(project):
+    nodes = project.projectnode_set.all().order_by('order')
+    idx = 0
+    for n in nodes:
+        n.order = idx
+        n.save()
+        idx += 1
+
+def fix_group_order(node):
+    children = node.node_group_parent.all().order_by('order')
+    idx = 0
+    for c in children:
+        c.order = idx
+        c.save()
+        idx += 1
 
 class ProfileView(APIView):
     permission_classes = [IsAuthenticated]
@@ -96,9 +122,7 @@ class NodesListView(APIView):
 
         ProjectNode(project=project, node=new_node, order=last_order+1).save()
 
-        nodes = project.projectnode_set.all()
-        result = ProjectNodeSerializer(nodes, many=True).data
-        return Response(result)
+        return result_project_nodes(project)
 
 
 class NodeDetailView(APIView):
@@ -159,9 +183,7 @@ class NodeDetailView(APIView):
 
         NodeGroupChild(group=node, child=new_node, order=last_order+1).save()
 
-        children = node.node_group_parent.all()
-        result = NodeGroupChildSerializer(children, many=True).data
-        return Response(result)
+        return result_group_nodes(node)
 
 class ProjectSetChildView(APIView):
     permission_classes = [IsAuthenticated]
@@ -180,16 +202,27 @@ class ProjectSetChildView(APIView):
         except Node.DoesNotExist:
             return Response("Not found node", status=404)
 
-        ProjectNode.objects.filter(node=move_node).delete()
-        NodeGroupChild.objects.filter(child=move_node).delete()
+        # Delete from the old location and redo the order
+        for pn in ProjectNode.objects.filter(node=move_node):
+            pn.delete()
+            fix_project_order(pn.project)
+
+        for ngc in NodeGroupChild.objects.filter(child=move_node):
+            ngc.delete()
+            fix_group_order(ngc.group)
+
+        # Set the order space
+        nodes = project.projectnode_set.all()
+        for node in nodes:
+            if node.order >= serializer.data['order']:
+                node.order += 1
+                node.save()
 
         ProjectNode(project=project, node=move_node, order=serializer.data['order']).save()
 
-        # TODO: Reorder all children
+        fix_project_order(project)
 
-        nodes = project.projectnode_set.all()
-        result = ProjectNodeSerializer(nodes, many=True).data
-        return Response(result)
+        return result_project_nodes(project)
 
 class NodeSetChildView(APIView):
     permission_classes = [IsAuthenticated]
@@ -213,14 +246,25 @@ class NodeSetChildView(APIView):
         except Node.DoesNotExist:
             return Response("Not found node", status=404)
 
-        ProjectNode.objects.filter(node=move_node).delete()
-        NodeGroupChild.objects.filter(child=move_node).delete()
+        for pn in ProjectNode.objects.filter(node=move_node):
+            pn.delete()
+            fix_project_order(pn.project)
 
+        for ngc in NodeGroupChild.objects.filter(child=move_node):
+            ngc.delete()
+            fix_group_order(ngc.group)
+
+        # Set the order space
+        children = node.node_group_parent.all()
+        for child in children:
+            print(child)
+            if child.order >= serializer.data['order']:
+                print(child.order)
+                child.order += 1
+                print(child.order)
+                child.save()
 
         NodeGroupChild(group=node, child=move_node, order=serializer.data['order']).save()
+        fix_group_order(node)
 
-        # TODO: Reorder all children
-
-        children = node.node_group_parent.all()
-        result = NodeGroupChildSerializer(children, many=True).data
-        return Response(result)
+        return result_group_nodes(node)

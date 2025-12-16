@@ -46,10 +46,10 @@ class NodeSerializer(serializers.BaseSerializer):
         if data['type'] == 'scene':
             return SceneSerializer(data=data)
 
-        elif data['type'] == 'nodegroup':
+        elif data['type'] == 'node-group':
             return NodeGroupSerializer(data=data)
 
-        elif data['type'] == 'loreentity':
+        elif data['type'] == 'lore-entity':
             return LoreEntitySerializer(data=data)
 
         else:
