@@ -2,8 +2,10 @@ import type { Route } from "./+types/login";
 import { redirect, Form } from "react-router";
 import { BookHeart } from "lucide-react";
 
+import { AuthApiRepository } from "~/.server/auth";
+import LoginUseCase from "~/core/login-use-case";
+
 import { Heading, TextInput, Button, Message, Container } from "~/ui";
-import { verifyUser } from "~/.server/auth";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -21,7 +23,10 @@ export async function action({ request }: Route.ActionArgs) {
     return { error: "User and password are required" };
   }
 
-  const token = await verifyUser(userId, password);
+  const authRepository = new AuthApiRepository();
+  const loginUseCase = new LoginUseCase(authRepository);
+  const token = await loginUseCase.execute(userId, password);
+
   if (!token) {
     return { error: "Invalid user or password" };
   }
