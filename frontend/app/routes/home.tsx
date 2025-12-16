@@ -4,6 +4,7 @@ import { BookHeart } from "lucide-react";
 
 import { getUserFromSession } from "~/.server/auth";
 import Heading from "~/ui/heading";
+import { authMiddleware } from "~/middleware/auth";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -11,6 +12,8 @@ export function meta({}: Route.MetaArgs) {
     { name: "description", content: "Minimalist creative writing app" },
   ];
 }
+
+export const middleware: Route.MiddlewareFunction[] = [authMiddleware];
 
 export async function loader({ request }: Route.LoaderArgs) {
   const user = await getUserFromSession(request);
