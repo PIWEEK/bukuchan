@@ -69,7 +69,9 @@ class LoreEntitySerializer(serializers.ModelSerializer):
 
 class NodeGroupChildSerializer(serializers.BaseSerializer):
     def to_representation(self, instance):
-        return NodeSerializer(instance.child).data
+        data = NodeSerializer(instance.child).data
+        data['order'] = instance.order
+        return data
     
 class NodeGroupSerializer(serializers.ModelSerializer):
     children = NodeGroupChildSerializer(many=True, source='node_group_parent', read_only=True)

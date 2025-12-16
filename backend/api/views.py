@@ -144,8 +144,7 @@ class NodeDetailView(APIView):
             if child.order > last_order:
                 last_order = node.order
 
-
-        NodeGroupChild(group=node, child=new_node, order=last_order).save()
+        NodeGroupChild(group=node, child=new_node, order=last_order+1).save()
 
         children = node.node_group_parent.all()
         result = NodeGroupChildSerializer(children, many=True).data
@@ -155,6 +154,6 @@ class NodeDetailView(APIView):
 class NodeSetChildView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get(self, request, pk=None, node_pk=None):
+    def post(self, request, pk=None, node_pk=None):
         pass
 
