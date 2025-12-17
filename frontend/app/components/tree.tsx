@@ -1,5 +1,11 @@
-import { Tree, TreeItem, TreeItemContent } from "react-aria-components";
-import Button from "~/ui/button";
+import {
+  Tree,
+  TreeItem,
+  TreeItemContent,
+  useDragAndDrop,
+  Collection,
+  useTreeData,
+} from "react-aria-components";
 
 import {
   Plus,
@@ -10,6 +16,16 @@ import {
   Clapperboard,
   Box,
 } from "lucide-react";
+
+import Button from "~/ui/button";
+
+// FIXME: this should be somewhere else
+type StoryNode = {
+  id: string;
+  title: string;
+  nodeType: "group" | "scene" | "lore-entity";
+  children?: StoryNode[];
+};
 
 function CollapsibleItem({
   id,
@@ -94,21 +110,95 @@ export function TerminalItem({
 }
 
 export default function StoryTree({ className }: { className?: string }) {
+  const tree = useTreeData<StoryNode>({
+    initialItems: [
+      {
+        id: "001",
+        title: "Draft",
+        nodeType: "group",
+        children: [
+          {
+            id: "004",
+            title: "Act I",
+            nodeType: "group",
+            children: [
+              {
+                id: "002",
+                title: "Catalyst",
+                nodeType: "scene",
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: "003",
+        title: "Characters",
+        nodeType: "group",
+        children: [
+          {
+            id: "005",
+            title: "Bilbo",
+            nodeType: "lore-entity",
+          },
+          {
+            id: "006",
+            title: "Gandalf",
+            nodeType: "lore-entity",
+          },
+        ],
+      },
+    ],
+  });
+
+  const { dragAndDropHooks } = useDragAndDrop({
+    getItems: (keys, items: typeof tree.items) =>
+      items.map((item) => ({ "text/plain": item.value.title })),
+    onMove: (e: any) => {
+      console.log(e);
+      console.log("drop position", e.target.dropPosition);
+    },
+  });
+
   return (
     <section className={`${className} w-full`}>
       <Button variant="ghost" icon={Plus} className="-ms-2">
         Add node
       </Button>
-      <Tree className="pt-2" aria-label="Story Tree">
-        <CollapsibleItem id="001" title="Draft" icon={Circle}>
-          <CollapsibleItem id="004" title="Act I" icon={Circle}>
-            <TerminalItem title="Catalyst" id="002" icon={Clapperboard} />
-          </CollapsibleItem>
-        </CollapsibleItem>
-        <CollapsibleItem id="003" title="Characters" icon={Circle}>
-          <TerminalItem id="005" title="Bilbo" icon={Box} />
-          <TerminalItem id="006" title="Gandalf" icon={Box} />
-        </CollapsibleItem>
+      <Tree
+        className="pt-2"
+        aria-label="Story Tree"
+        dragAndDropHooks={dragAndDropHooks}
+        items={tree.items}
+        defaultExpandedKeys={["001", "003"]}
+      >
+        {function renderItem(
+          item: (typeof tree.items)[number]
+        ): React.ReactNode {
+          if (item.value.nodeType === "group") {
+            return (
+              <CollapsibleItem
+                id={item.value.id}
+                title={item.value.title}
+                icon={Circle}
+              >
+                <Collection items={item.children ?? []}>
+                  {renderItem}
+                </Collection>
+              </CollapsibleItem>
+            );
+          }
+
+          const icon = item.value.nodeType === "scene" ? Clapperboard : Box;
+
+          return (
+            <TerminalItem
+              id={item.value.id}
+              title={item.value.title}
+              icon={icon}
+            />
+          );
+        }}
       </Tree>
     </section>
   );
