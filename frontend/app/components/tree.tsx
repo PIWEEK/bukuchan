@@ -1,93 +1,115 @@
-import { Button, Tree, TreeItem, TreeItemContent } from "react-aria-components";
-import type {
-  TreeItemContentProps,
-  TreeItemContentRenderProps,
-} from "react-aria-components";
+import { Tree, TreeItem, TreeItemContent } from "react-aria-components";
+import Button from "~/ui/button";
 
-import { Info, GripVertical } from "lucide-react";
+import {
+  Plus,
+  Circle,
+  ChevronDown,
+  ChevronRight,
+  GripVertical,
+  Clapperboard,
+  Box,
+} from "lucide-react";
 
-function MyTreeItemContent(
-  props: { children?: React.ReactNode } & TreeItemContentProps
-) {
+function CollapsibleItem({
+  id,
+  title,
+  children,
+  icon: Icon,
+}: {
+  id: string;
+  title: string;
+  icon: React.ElementType;
+  children?: React.ReactNode;
+}) {
   return (
-    <TreeItemContent>
-      {({ allowsDragging }: TreeItemContentRenderProps) => (
-        <>
-          {allowsDragging && (
-            <Button slot="drag">
-              <GripVertical size={18} />
-            </Button>
-          )}
-          <Button slot="chevron">
-            <svg viewBox="0 0 24 24">
-              <path d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-            </svg>
-          </Button>
-          {props.children}
-        </>
-      )}
-    </TreeItemContent>
+    <TreeItem
+      textValue={title}
+      className="flex gap-1 flex-row items-center py-1"
+      id={id}
+    >
+      <TreeItemContent>
+        {({ isExpanded, hasChildItems, level }) => (
+          <>
+            <Button
+              slot="drag"
+              icon={GripVertical}
+              variant="ghost"
+              style={{
+                marginInlineStart: `calc(${(level - 1) * 5} * var(--spacing)`,
+              }}
+              className="px-0"
+            />
+            <Button
+              variant="ghost"
+              slot="chevron"
+              icon={isExpanded ? ChevronDown : ChevronRight}
+              className={`px-0`}
+              isDisabled={!hasChildItems}
+            />
+            <Icon size={16} className="text-current" aria-label="Group" />
+            {title}
+          </>
+        )}
+      </TreeItemContent>
+      {children}
+    </TreeItem>
   );
 }
 
-export default function DocumentTree({ className }: { className?: string }) {
+export function TerminalItem({
+  id,
+  title,
+  icon: Icon,
+}: {
+  id: string;
+  title: string;
+  icon: React.ElementType;
+}) {
   return (
-    <Tree
-      className={className}
-      aria-label="Files"
-      style={{ height: "300px" }}
-      defaultExpandedKeys={["documents", "photos", "project"]}
-      selectionMode="multiple"
-      defaultSelectedKeys={["photos"]}
+    <TreeItem
+      textValue={title}
+      className="flex gap-1 flex-row items-center py-1"
+      id={id}
     >
-      <TreeItem id="documents" textValue="Documents">
-        <MyTreeItemContent>
-          Documents
-          <Button aria-label="Info">
-            <Info size={20} />
-          </Button>
-        </MyTreeItemContent>
-        <TreeItem id="project" textValue="Project">
-          <MyTreeItemContent>
-            Project
-            <Button aria-label="Info">
-              <Info size={20} />
-            </Button>
-          </MyTreeItemContent>
-          <TreeItem id="report" textValue="Weekly Report">
-            <MyTreeItemContent>
-              Weekly Report
-              <Button aria-label="Info">
-                <Info size={20} />
-              </Button>
-            </MyTreeItemContent>
-          </TreeItem>
-        </TreeItem>
-      </TreeItem>
-      <TreeItem id="photos" textValue="Photos">
-        <MyTreeItemContent>
-          Photos
-          <Button aria-label="Info">
-            <Info size={20} />
-          </Button>
-        </MyTreeItemContent>
-        <TreeItem id="one" textValue="Image 1">
-          <MyTreeItemContent>
-            Image 1
-            <Button aria-label="Info">
-              <Info size={20} />
-            </Button>
-          </MyTreeItemContent>
-        </TreeItem>
-        <TreeItem id="two" textValue="Image 2">
-          <MyTreeItemContent>
-            Image 2
-            <Button aria-label="Info">
-              <Info size={20} />
-            </Button>
-          </MyTreeItemContent>
-        </TreeItem>
-      </TreeItem>
-    </Tree>
+      <TreeItemContent>
+        {({ level }) => (
+          <>
+            <Button
+              slot="drag"
+              icon={GripVertical}
+              variant="ghost"
+              className="px-0"
+              style={{
+                marginInlineStart: `calc(${(level - 1) * 5} * var(--spacing)`,
+              }}
+            />
+            <Icon size={16} className="text-current" aria-label="Group" />
+            {title}
+          </>
+        )}
+      </TreeItemContent>
+    </TreeItem>
+  );
+}
+
+export default function StoryTree({ className }: { className?: string }) {
+  return (
+    <section className={`${className} w-full`}>
+      <Button variant="ghost" icon={Plus} className="-ms-2">
+        Add node
+      </Button>
+      <Tree className="pt-2" aria-label="Story Tree">
+        <CollapsibleItem id="001" title="Draft" icon={Circle}>
+          <CollapsibleItem id="004" title="Act I" icon={Circle}>
+            <TerminalItem title="Catalyst" id="002" icon={Clapperboard} />
+          </CollapsibleItem>
+        </CollapsibleItem>
+        <CollapsibleItem id="003" title="Characters" icon={Circle}>
+          <TerminalItem id="005" title="Bilbo" icon={Box} />
+          <TerminalItem id="006" title="Gandalf" icon={Box} />
+        </CollapsibleItem>
+      </Tree>
+    </section>
   );
 }

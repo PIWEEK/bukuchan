@@ -5,7 +5,7 @@ import { useNavigate } from "react-router";
 import { userContext } from "~/context";
 import { StoryApiRepository } from "~/.server/story";
 import GetAllStoriesUseCase from "~/core/get-all-stories-use-case";
-import DocumentTree from "~/components/tree";
+import StoryTree from "~/components/tree";
 import Editor from "~/components/editor";
 import StorySelector from "~/components/story-selector";
 import { Container, Message } from "~/ui";
@@ -43,8 +43,8 @@ export default function Story({ loaderData }: Route.ComponentProps) {
   }
 
   return (
-    <article className="grid w-full grid-cols-[auto_1fr] gap-8 py-8">
-      <aside className="h-full px-6">
+    <article className="grid w-full grid-cols-[auto_1fr] py-8">
+      <aside className="h-full pl-6 w-sm">
         {/* TODO: Extract this to a UserSidebar component */}
         <section className="w-full border-b border-gray-400 pb-4">
           <StorySelector
@@ -54,10 +54,11 @@ export default function Story({ loaderData }: Route.ComponentProps) {
             onChange={onStoryChange}
           />
         </section>
-        <DocumentTree className="py-4"></DocumentTree>
+        <StoryTree className="py-6 w-full"></StoryTree>
       </aside>
 
       <section className="h-full px-6 mx-auto container">
+        {/* <Editor /> */}
       </section>
     </article>
   );

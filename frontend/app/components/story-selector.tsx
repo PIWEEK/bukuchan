@@ -18,6 +18,7 @@ export default function StorySelector({
     <div className="flex gap-2 flex-row items-center">
       <NotebookPen size={20} />
       <select
+        name="story-selector"
         className={`${className} outline-none focus-visible:ring-2 focus-visible:ring-light-or rounded-md`}
         onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
           if (onChange) {
@@ -25,14 +26,11 @@ export default function StorySelector({
             onChange(e.currentTarget.value);
           }
         }}
+        defaultValue={currentId}
         {...other}
       >
         {stories.map((story) => (
-          <option
-            key={story.id}
-            value={story.id}
-            selected={story.id === currentId}
-          >
+          <option key={story.id} value={story.id}>
             {story.title}
           </option>
         ))}
