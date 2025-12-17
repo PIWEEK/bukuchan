@@ -25,30 +25,35 @@ export default function Button({
   variant = "primary",
   to,
   className = "",
+  slot,
   ...other
 }: {
   children?: React.ReactNode;
   variant?: keyof typeof variants;
   icon?: React.ElementType;
   to?: string;
+  slot?: string;
   className?: string;
 } & React.ComponentProps<typeof AriaButton>) {
   const { bgColor, textColor } = variants[variant];
   const navigate = useNavigate();
 
-  const onPress = useCallback(
-    (event: PressEvent) => {
-      if (to) {
-        navigate(to);
-      }
-      other.onPress?.(event);
-    },
-    [to, navigate, other]
-  );
+  const onPress = slot
+    ? undefined
+    : useCallback(
+        (event: PressEvent) => {
+          if (to) {
+            navigate(to);
+          }
+          other.onPress?.(event);
+        },
+        [to, navigate, other]
+      );
 
   return (
     <AriaButton
       onPress={onPress}
+      slot={slot}
       className={`${bgColor} ${textColor} rounded-md p-2 flex gap-1 flex-row items-center ${className}`}
       {...other}
     >
