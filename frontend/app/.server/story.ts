@@ -1,4 +1,3 @@
-import type User from "~/core/user";
 import type StoryRepository from "~/core/story-repository";
 import Story from "~/core/story";
 
