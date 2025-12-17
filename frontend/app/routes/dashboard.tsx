@@ -5,8 +5,6 @@ import { BookHeart } from "lucide-react";
 import { authMiddleware } from "~/middleware/auth";
 import { userContext } from "~/context";
 
-import { DocumentTree } from "~/ui";
-
 export function meta({}: Route.MetaArgs) {
   return [
     { title: "Bukuchan" },
