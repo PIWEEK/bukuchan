@@ -13,18 +13,6 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 
-// export default function DashboardIndex() {
-//   return (
-//     <article className="grid gap-4 h-full">
-//       <Editor></Editor>
-//       {/*}
-//       <p>You have no stories yet.</p>
-//       <p>
-//         <Button to="/dashboard/new-story">Create a new story</Button>
-//       </p>
-//       {*/}
-//     </article>
-//   );
 export async function loader({ context }: Route.LoaderArgs) {
   const session = context.get(userContext);
 

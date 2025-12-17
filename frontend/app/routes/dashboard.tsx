@@ -42,16 +42,9 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
           Logged in as <b>{user.username}</b>. <Link to="/logout">Logout</Link>
         </p>
       </header>
-
-      <div className="flex">
-        <sidebar className="h-full py-6 px-6 ">
-          <DocumentTree></DocumentTree>
-        </sidebar>
-
-        <main className="h-full py-6 px-6 container mx-auto">
-          <Outlet />
-        </main>
-      </div>
+      <main className="h-full w-full mx-auto">
+        <Outlet />
+      </main>
     </>
   );
 }
