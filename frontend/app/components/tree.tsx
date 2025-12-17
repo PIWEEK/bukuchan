@@ -30,9 +30,10 @@ function MyTreeItemContent(
   );
 }
 
-export default function DocumentTree() {
+export default function DocumentTree({ className }: { className?: string }) {
   return (
     <Tree
+      className={className}
       aria-label="Files"
       style={{ height: "300px" }}
       defaultExpandedKeys={["documents", "photos", "project"]}
