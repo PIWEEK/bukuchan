@@ -1,15 +1,17 @@
-import {Button, Collection, Tree, TreeItem, TreeItemContent} from 'react-aria-components';
-import {Info} from 'lucide-react';
+import { Button, Tree, TreeItem, TreeItemContent } from "react-aria-components";
+import type {
+  TreeItemContentProps,
+  TreeItemContentRenderProps,
+} from "react-aria-components";
+
+import { Info, GripVertical } from "lucide-react";
 
 function MyTreeItemContent(
-  props: Omit<TreeItemContentProps, 'children'> & { children?: React.ReactNode }
+  props: { children?: React.ReactNode } & TreeItemContentProps
 ) {
   return (
     <TreeItemContent>
-      {(
-        { hasChildItems, selectionBehavior, selectionMode, allowsDragging }:
-          TreeItemContentRenderProps
-      ) => (
+      {({ allowsDragging }: TreeItemContentRenderProps) => (
         <>
           {allowsDragging && (
             <Button slot="drag">
@@ -32,10 +34,10 @@ export default function DocumentTree() {
   return (
     <Tree
       aria-label="Files"
-      style={{ height: '300px' }}
-      defaultExpandedKeys={['documents', 'photos', 'project']}
+      style={{ height: "300px" }}
+      defaultExpandedKeys={["documents", "photos", "project"]}
       selectionMode="multiple"
-      defaultSelectedKeys={['photos']}
+      defaultSelectedKeys={["photos"]}
     >
       <TreeItem id="documents" textValue="Documents">
         <MyTreeItemContent>
@@ -88,7 +90,3 @@ export default function DocumentTree() {
     </Tree>
   );
 }
-
-
-
-

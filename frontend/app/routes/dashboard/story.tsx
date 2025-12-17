@@ -1,4 +1,4 @@
-import { DocumentTree } from "~/ui";
+import DocumentTree from "~/components/tree";
 import Editor from "~/components/editor";
 
 export default function Story() {
