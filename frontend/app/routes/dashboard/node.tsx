@@ -1,4 +1,4 @@
-import type { Route } from "./+types/story";
+import type { Route } from "./+types/node";
 import { useCallback } from "react";
 import { useNavigate, useFetcher } from "react-router";
 
@@ -6,7 +6,7 @@ import { userContext } from "~/context";
 import { StoryApiRepository } from "~/.server/story";
 import { NodeApiRepository } from "~/.server/node";
 import GetAllStoriesUseCase from "~/core/get-all-stories-use-case";
-import DocumentTree from "~/components/tree";
+import StoryTree from "~/components/tree";
 import Editor from "~/components/editor";
 import StorySelector from "~/components/story-selector";
 import { Container, Message } from "~/ui";
@@ -16,6 +16,7 @@ export async function loader({ context, params }: Route.LoaderArgs) {
   const storyRepository = new StoryApiRepository(session?.token ?? "");
   const nodeRepository = new NodeApiRepository(session?.token ?? "");
   const getAllStoriesUseCase = new GetAllStoriesUseCase(storyRepository);
+
   try {
     const stories = await getAllStoriesUseCase.execute();
     const node = await nodeRepository.getById(params.id, params.node);
@@ -46,7 +47,10 @@ export async function action({ context, request }: Route.ActionArgs) {
   }
 }
 
-export default function Story({ actionData, loaderData }: Route.ComponentProps) {
+export default function Story({
+  actionData,
+  loaderData,
+}: Route.ComponentProps) {
   const { error, stories, storyId, node, nodeId } = loaderData;
   const navigate = useNavigate();
 
@@ -61,12 +65,14 @@ export default function Story({ actionData, loaderData }: Route.ComponentProps) 
 
   const onContentChange = useCallback(
     (text: string) => {
-      fetcher.submit(
-        {storyId, nodeId, text},
-        { method: "post" }
-      );
-    }
-  )
+      const formData = new FormData();
+      formData.append("storyId", storyId ?? "");
+      formData.append("nodeId", nodeId ?? "");
+      formData.append("text", text ?? "");
+      return fetcher.submit(formData, { method: "post" });
+    },
+    [fetcher, storyId, nodeId]
+  );
 
   if (error || !stories || !storyId) {
     return (
@@ -88,13 +94,12 @@ export default function Story({ actionData, loaderData }: Route.ComponentProps) 
             onChange={onStoryChange}
           />
         </section>
-        <DocumentTree className="py-4"></DocumentTree>
+
+        <StoryTree className="py-6 w-full"></StoryTree>
       </aside>
 
       <section className="h-full px-6 mx-auto container">
-        <Editor
-          content={node.text}
-          onContentChange={onContentChange} />
+        <Editor content={node.text} onContentChange={onContentChange} />
       </section>
     </article>
   );

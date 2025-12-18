@@ -58,7 +58,7 @@ export default function Story({ loaderData }: Route.ComponentProps) {
       </aside>
 
       <section className="h-full px-6 mx-auto container">
-        <Editor />
+        <p>TODO</p>
       </section>
     </article>
   );
