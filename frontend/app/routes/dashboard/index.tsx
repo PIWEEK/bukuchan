@@ -21,7 +21,6 @@ export async function loader({ context }: Route.LoaderArgs) {
 
   try {
     const stories = await getAllStoriesUseCase.execute();
-    console.log(stories);
     return { stories };
   } catch (error) {
     return { error: "Failed to get stories" };
