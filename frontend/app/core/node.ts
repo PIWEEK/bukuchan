@@ -1,18 +1,23 @@
+export type NodeType = "scene" | "loreentity" | "node-group";
+
 export default class Node {
   readonly id: string;
-  readonly type: 'scene' | 'lore-entity' | 'node-group';
+  readonly nodeType: NodeType;
   readonly name: string;
   readonly text: string;
+  readonly children: Node[] = [];
 
   constructor(
     id: string,
-    type: 'scene' | 'lore-entity' | 'node-group',
+    nodeType: NodeType,
     name: string,
     text: string,
+    children: Node[] = []
   ) {
     this.id = id;
-    this.type = type;
+    this.nodeType = nodeType;
     this.name = name;
     this.text = text;
+    this.children = children;
   }
 }
