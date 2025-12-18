@@ -6,9 +6,7 @@ import { userContext } from "~/context";
 import { StoryApiRepository } from "~/.server/story";
 import { NodeApiRepository } from "~/.server/node";
 import GetAllStoriesUseCase from "~/core/get-all-stories-use-case";
-import StoryTree from "~/components/tree";
 import Editor from "~/components/editor";
-import StorySelector from "~/components/story-selector";
 import { Container, Message } from "~/ui";
 
 export async function loader({ context, params }: Route.LoaderArgs) {
@@ -82,25 +80,5 @@ export default function Story({
     );
   }
 
-  return (
-    <article className="grid w-full grid-cols-[auto_1fr] gap-8 py-8">
-      <aside className="h-full px-6">
-        {/* TODO: Extract this to a UserSidebar component */}
-        <section className="w-full border-b border-gray-400 pb-4">
-          <StorySelector
-            stories={stories}
-            currentId={storyId}
-            className="w-full"
-            onChange={onStoryChange}
-          />
-        </section>
-
-        <StoryTree className="py-6 w-full"></StoryTree>
-      </aside>
-
-      <section className="h-full px-6 mx-auto container">
-        <Editor content={node.text} onContentChange={onContentChange} />
-      </section>
-    </article>
-  );
+  return <Editor content={node.text} onContentChange={onContentChange} />;
 }
