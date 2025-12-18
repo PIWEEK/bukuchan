@@ -102,6 +102,7 @@ export default function Story({ loaderData }: Route.ComponentProps) {
         </section>
         <StoryTree
           className="py-6 w-full"
+          key={storyNodes.map((node) => node.id).join(",")}
           nodes={storyNodes}
           defaultSelected={selectedNode}
         ></StoryTree>
