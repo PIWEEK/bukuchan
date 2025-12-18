@@ -46,7 +46,29 @@ class TextAnalyzer:
         return len(self.get_tokens())
 
     def frequencies(self):
-        pass
+        result = []
+        tokens = self.get_tokens()
+        words = [ token.lemma_ for token in tokens if not token.is_stop ]
+        counter = Counter(words)
+
+        for token in tokens:
+            result.append({
+                'text': token.text,
+                'lemma': token.lemma_,
+                'count': counter[token.lemma_]
+            })
+        return result
+
 
     def word_tags(self):
-        pass
+        result = []
+        tokens = self.get_tokens()
+
+        for token in tokens:
+            result.append({
+                'text': token.text,
+                'pos': token.pos_,
+            })
+
+
+        return result

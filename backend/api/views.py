@@ -123,7 +123,6 @@ class ProjectExportView(APIView):
 
         output_txt = "\n\n".join(content)
 
-        print(output_txt)
         output = convert_markdown.to(
             markdown=output_txt,
             style='style',
