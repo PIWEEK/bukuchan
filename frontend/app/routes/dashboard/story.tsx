@@ -1,12 +1,11 @@
 import type { Route } from "./+types/story";
 import { useCallback } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, Outlet } from "react-router";
 
 import { userContext } from "~/context";
 import { StoryApiRepository } from "~/.server/story";
 import GetAllStoriesUseCase from "~/core/get-all-stories-use-case";
 import StoryTree from "~/components/tree";
-import Editor from "~/components/editor";
 import StorySelector from "~/components/story-selector";
 import { Container, Message } from "~/ui";
 
@@ -58,7 +57,7 @@ export default function Story({ loaderData }: Route.ComponentProps) {
       </aside>
 
       <section className="h-full px-6 mx-auto container">
-        <p>TODO</p>
+        <Outlet />
       </section>
     </article>
   );
