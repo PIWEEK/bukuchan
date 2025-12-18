@@ -12,7 +12,7 @@ import EditorMenu from "./editor-menu";
 const extensions = [TextStyleKit, StarterKit, Markdown ];
 
 
-export default ({content, onContentChange}) => {
+export default ({content, onContentChange}: { content: string; onContentChange: any}) => {
   const editor = useEditor({
     immediatelyRender: false,
     extensions,

@@ -108,7 +108,7 @@ export default function Story({ loaderData }: Route.ComponentProps) {
         ></StoryTree>
       </aside>
 
-      <section className="h-full px-6 mx-auto container">
+      <section className="h-full px-6 mx-auto ">
         <Outlet />
       </section>
     </article>

@@ -44,8 +44,9 @@ export default ({ editor }: { editor: Editor }) => {
   return (
     <div className="flex gap-1 mb-8 flex-wrap bg-base-100 p-1 rounded">
       <Button
+        variant="secondary"
         onClick={() => editor.chain().focus().toggleBold().run()}
-        disabled={!editorState.canBold}
+        isDisabled={!editorState.canBold}
         className={classNames(
           buttonCommon,
           { [buttonActive]: editorState.isBold}
@@ -54,8 +55,9 @@ export default ({ editor }: { editor: Editor }) => {
         <icons.Bold size={ICON_SIZE} />
       </Button>
       <Button
+        variant="secondary"
         onClick={() => editor.chain().focus().toggleItalic().run()}
-        disabled={!editorState.canItalic}
+        isDisabled={!editorState.canItalic}
         className={classNames(
           buttonCommon,
           { [buttonActive]: editorState.isItalic}
@@ -64,8 +66,9 @@ export default ({ editor }: { editor: Editor }) => {
         <icons.Italic size={ICON_SIZE}/>
       </Button>
       <Button
+        variant="secondary"
         onClick={() => editor.chain().focus().toggleStrike().run()}
-        disabled={!editorState.canStrike}
+        isDisabled={!editorState.canStrike}
         className={classNames(
           buttonCommon,
           { [buttonActive]: editorState.isStrike}
@@ -74,8 +77,9 @@ export default ({ editor }: { editor: Editor }) => {
         <icons.Strikethrough size={ICON_SIZE}/>
       </Button>
       <Button
+        variant="secondary"
         onClick={() => editor.chain().focus().toggleCode().run()}
-        disabled={!editorState.canCode}
+        isDisabled={!editorState.canCode}
         className={classNames(
           buttonCommon,
           { [buttonActive]: editorState.isCode}
@@ -84,6 +88,7 @@ export default ({ editor }: { editor: Editor }) => {
         <icons.Code size={ICON_SIZE}/>
       </Button>
       <Button
+        variant="secondary"
         onClick={() => {
           editor.chain().focus().unsetAllMarks().run();
           editor.chain().focus().clearNodes().run();
@@ -92,6 +97,7 @@ export default ({ editor }: { editor: Editor }) => {
         <icons.RemoveFormatting size={ICON_SIZE}/>
       </Button>
       <Button
+        variant="secondary"
         onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
         className={classNames(
           buttonCommon,
@@ -101,6 +107,7 @@ export default ({ editor }: { editor: Editor }) => {
         <icons.Heading1 size={ICON_SIZE}/>
       </Button>
       <Button
+        variant="secondary"
         onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
         className={classNames(
           buttonCommon,
@@ -110,6 +117,7 @@ export default ({ editor }: { editor: Editor }) => {
         <icons.Heading2 size={ICON_SIZE}/>
       </Button>
       <Button
+        variant="secondary"
         onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
         className={classNames(
           buttonCommon,
@@ -119,6 +127,7 @@ export default ({ editor }: { editor: Editor }) => {
         <icons.Heading3 size={ICON_SIZE}/>
       </Button>
       <Button
+        variant="secondary"
         onClick={() => editor.chain().focus().toggleBulletList().run()}
         className={classNames(
           buttonCommon,
@@ -128,6 +137,7 @@ export default ({ editor }: { editor: Editor }) => {
         <icons.List size={ICON_SIZE}/>
       </Button>
       <Button
+        variant="secondary"
         onClick={() => editor.chain().focus().toggleOrderedList().run()}
         className={classNames(
           buttonCommon,
@@ -137,6 +147,7 @@ export default ({ editor }: { editor: Editor }) => {
         <icons.ListOrdered size={ICON_SIZE}/>
       </Button>
       <Button
+        variant="secondary"
         onClick={() => editor.chain().focus().toggleBlockquote().run()}
         className={classNames(
           buttonCommon,
@@ -146,6 +157,7 @@ export default ({ editor }: { editor: Editor }) => {
         <icons.Quote size={ICON_SIZE}/>
       </Button>
       <Button
+        variant="secondary"
         onClick={() => editor.chain().focus().setHorizontalRule().run()}
         className={buttonCommon}>
         <icons.Rows2 size={ICON_SIZE}/>

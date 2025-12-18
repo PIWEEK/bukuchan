@@ -5,6 +5,8 @@ from .models import Project, ProjectNode, Node, NodeGroupChild, NodeGroup
 from .serializers import ProjectBasicSerializer, ProjectDetailSerializer, ProjectNodeSerializer, NodeSerializer, NodeGroupChildSerializer, ReparentSerializer
 from rest_framework.permissions import IsAuthenticated
 
+from .analysis import TextAnalyzer
+
 
 def result_project_nodes(project):
     nodes = project.projectnode_set.all().order_by('order')
@@ -285,3 +287,32 @@ class NodeSetChildView(APIView):
         fix_group_order(node)
 
         return result_group_nodes(node)
+
+class NodeAnalysisView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk=None, node_pk=None):
+        try:
+            project = Project.objects.get(id=pk)
+        except Project.DoesNotExist:
+            return Response("Not found project", status=404)
+
+        try:
+            node = Node.objects.get(id=node_pk).as_child()
+        except Node.DoesNotExist:
+            return Response("Not found node", status=404)
+
+        analyzer = TextAnalyzer(node.text)
+
+        result = {}
+
+        if 'word-count' in request.query_params:
+            result['word-count'] = analyzer.count_words()
+
+        if 'frequency' in request.query_params:
+            result['frequency'] = analyzer.frequencies()
+
+        if 'word-tags' in request.query_params:
+            result['word-tags'] = analyzer.word_tags()
+        
+        return Response(result)

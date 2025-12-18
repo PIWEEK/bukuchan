@@ -18,8 +18,9 @@ export async function loader({ context, params }: Route.LoaderArgs) {
   try {
     const stories = await getAllStoriesUseCase.execute();
     const node = await nodeRepository.getById(params.id, params.node);
+    const analysis = await nodeRepository.analysis(params.id, params.node);
 
-    return { stories, storyId: params.id, node, nodeId: params.node };
+    return { stories, storyId: params.id, node, nodeId: params.node, analysis };
   } catch (error) {
     console.error(error);
     return { error: "Failed to get stories" };
@@ -49,7 +50,7 @@ export default function Story({
   actionData,
   loaderData,
 }: Route.ComponentProps) {
-  const { error, stories, storyId, node, nodeId } = loaderData;
+  const { error, stories, storyId, node, nodeId, analysis } = loaderData;
   const navigate = useNavigate();
 
   const fetcher = useFetcher();
@@ -80,5 +81,16 @@ export default function Story({
     );
   }
 
-  return <Editor content={node.text} onContentChange={onContentChange} />;
+  return (
+    <div className="flex gap-4">
+      <div className="container">
+        <Editor
+          content={node.text}
+          onContentChange={onContentChange} />
+      </div>
+      <div className="w-3xs">
+        <div className="bg-base-200 h-auto rounded p-2">Word count: {analysis['word-count']}</div>
+      </div>
+    </div>
+  );
 }

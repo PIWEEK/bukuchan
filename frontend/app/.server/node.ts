@@ -1,5 +1,6 @@
 import type NodeRepository from "~/core/node-repository";
 import Node from "~/core/node";
+import type AnalysisData from "~/core/analysis-data";
 
 const BASE_ENDPOINT = "http://localhost:8000/api";
 
@@ -60,6 +61,22 @@ export class NodeApiRepository implements NodeRepository {
 
     const data = await response.json();
     return new Node(`${data.id}`, data.type, data.name, data.text);
+  }
+
+  async analysis(storyId: string, nodeId: string): Promise<AnalysisData> {
+    const response = await fetch(`${BASE_ENDPOINT}/projects/${storyId}/nodes/${nodeId}/analysis?word-count`, {
+      method: "GET",
+      headers: {
+        Authorization: `Token ${this.token}`,
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to query data");
+    }
+
+    const data = await response.json() as AnalysisData;
+    return data;
   }
 
   async getAll(storyId: string): Promise<Node[]> {
