@@ -15,5 +15,6 @@ export default [
     index("routes/dashboard/index.tsx"),
     route("stories/new", "routes/dashboard/new-story.tsx"),
     route("stories/:id", "routes/dashboard/story.tsx"),
+    route("stories/:id/node/:node", "routes/dashboard/node.tsx"),
   ]),
 ] satisfies RouteConfig;

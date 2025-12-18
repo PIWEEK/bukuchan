@@ -57,6 +57,21 @@ class NodeSerializer(serializers.BaseSerializer):
                 'type': 'Type is not valid'
             })
 
+    def get_updater(self, instance, data):
+        if data['type'] == 'scene':
+            return SceneSerializer(instance=instance.as_child(), data=data, partial=True)
+
+        elif data['type'] == 'node-group':
+            return NodeGroupSerializer(instance=instance.as_child(), data=data, partial=True)
+
+        elif data['type'] == 'lore-entity':
+            return LoreEntitySerializer(instance=instance.as_child(), data=data, partial=True)
+
+        else:
+            raise serializers.ValidationError({
+                'type': 'Type is not valid'
+            })
+
 class SceneSerializer(serializers.ModelSerializer):
     class Meta:
         model = Scene

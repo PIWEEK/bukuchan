@@ -34,7 +34,7 @@ export default function Home() {
       />
       <Heading className="my-6 text-center">Hola!</Heading>
       <p className="text-center text-xl">
-        <Link to="/login">Login</Link>
+        <Link to="/login">oLogin</Link>
       </p>
     </article>
   );

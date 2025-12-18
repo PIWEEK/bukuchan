@@ -122,7 +122,7 @@ class NodesListView(APIView):
 
         ProjectNode(project=project, node=new_node, order=last_order+1).save()
 
-        return result_project_nodes(project)
+        return Response(NodeSerializer(new_node).data)
 
 
 class NodeDetailView(APIView):
@@ -184,6 +184,23 @@ class NodeDetailView(APIView):
         NodeGroupChild(group=node, child=new_node, order=last_order+1).save()
 
         return result_group_nodes(node)
+
+    def put(self, request, pk=None, node_pk=None):
+        try:
+            project = Project.objects.get(id=pk)
+        except Project.DoesNotExist:
+            return Response("Not found project", status=404)
+
+        try:
+            node = Node.objects.get(id=node_pk)
+        except Node.DoesNotExist:
+            return Response("Not found node", status=404)
+
+        serializer = NodeSerializer().get_updater(node, request.data)
+        serializer.is_valid(raise_exception=True)
+        result = serializer.save()
+
+        return Response(NodeSerializer(result).data)
 
 class ProjectSetChildView(APIView):
     permission_classes = [IsAuthenticated]

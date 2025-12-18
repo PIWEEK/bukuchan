@@ -3,10 +3,13 @@ import "./editor.css";
 import { TextStyleKit } from "@tiptap/extension-text-style";
 import type { Editor } from "@tiptap/react";
 import { EditorContent, useEditor, useEditorState } from "@tiptap/react";
+import { Markdown } from '@tiptap/markdown'
 import StarterKit from "@tiptap/starter-kit";
 import React from "react";
 
-const extensions = [TextStyleKit, StarterKit];
+import * as icons from "lucide-react";
+
+const extensions = [TextStyleKit, StarterKit, Markdown ];
 
 function MenuBar({ editor }: { editor: Editor }) {
   // Read the current editor's state, and re-render the component when it changes
@@ -47,34 +50,34 @@ function MenuBar({ editor }: { editor: Editor }) {
         disabled={!editorState.canBold}
         className={editorState.isBold ? "is-active" : ""}
       >
-        Bold
+        <icons.Bold />
       </button>
       <button
         onClick={() => editor.chain().focus().toggleItalic().run()}
         disabled={!editorState.canItalic}
         className={editorState.isItalic ? "is-active" : ""}
       >
-        Italic
+        <icons.Italic />
       </button>
       <button
         onClick={() => editor.chain().focus().toggleStrike().run()}
         disabled={!editorState.canStrike}
         className={editorState.isStrike ? "is-active" : ""}
       >
-        Strike
+        <icons.Strikethrough/>
       </button>
       <button
         onClick={() => editor.chain().focus().toggleCode().run()}
         disabled={!editorState.canCode}
         className={editorState.isCode ? "is-active" : ""}
       >
-        Code
+        <icons.Code/>
       </button>
-      <button onClick={() => editor.chain().focus().unsetAllMarks().run()}>
-        Clear marks
-      </button>
-      <button onClick={() => editor.chain().focus().clearNodes().run()}>
-        Clear nodes
+      <button onClick={() => {
+        editor.chain().focus().unsetAllMarks().run();
+        editor.chain().focus().clearNodes().run();
+      }}>
+        <icons.RemoveFormatting/>
       </button>
       <button
         onClick={() => editor.chain().focus().setParagraph().run()}
@@ -86,85 +89,46 @@ function MenuBar({ editor }: { editor: Editor }) {
         onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
         className={editorState.isHeading1 ? "is-active" : ""}
       >
-        H1
+        <icons.Heading1/>
       </button>
       <button
         onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
         className={editorState.isHeading2 ? "is-active" : ""}
       >
-        H2
+        <icons.Heading2/>
       </button>
       <button
         onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
         className={editorState.isHeading3 ? "is-active" : ""}
       >
-        H3
-      </button>
-      <button
-        onClick={() => editor.chain().focus().toggleHeading({ level: 4 }).run()}
-        className={editorState.isHeading4 ? "is-active" : ""}
-      >
-        H4
-      </button>
-      <button
-        onClick={() => editor.chain().focus().toggleHeading({ level: 5 }).run()}
-        className={editorState.isHeading5 ? "is-active" : ""}
-      >
-        H5
-      </button>
-      <button
-        onClick={() => editor.chain().focus().toggleHeading({ level: 6 }).run()}
-        className={editorState.isHeading6 ? "is-active" : ""}
-      >
-        H6
+        <icons.Heading3/>
       </button>
       <button
         onClick={() => editor.chain().focus().toggleBulletList().run()}
         className={editorState.isBulletList ? "is-active" : ""}
       >
-        Bullet list
+        <icons.List/>
       </button>
       <button
         onClick={() => editor.chain().focus().toggleOrderedList().run()}
         className={editorState.isOrderedList ? "is-active" : ""}
       >
-        Ordered list
-      </button>
-      <button
-        onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-        className={editorState.isCodeBlock ? "is-active" : ""}
-      >
-        Code block
+        <icons.ListOrdered/>
       </button>
       <button
         onClick={() => editor.chain().focus().toggleBlockquote().run()}
         className={editorState.isBlockquote ? "is-active" : ""}
       >
-        Blockquote
+        <icons.Quote/>
       </button>
       <button onClick={() => editor.chain().focus().setHorizontalRule().run()}>
-        Horizontal rule
-      </button>
-      <button onClick={() => editor.chain().focus().setHardBreak().run()}>
-        Hard break
-      </button>
-      <button
-        onClick={() => editor.chain().focus().undo().run()}
-        disabled={!editorState.canUndo}
-      >
-        Undo
-      </button>
-      <button
-        onClick={() => editor.chain().focus().redo().run()}
-        disabled={!editorState.canRedo}
-      >
-        Redo
+        <icons.Rows2/>
       </button>
     </div>
   );
 }
 
-export default () => {
+export default ({content, onContentChange}) => {
   const editor = useEditor({
     immediatelyRender: false,
     extensions,
@@ -173,43 +137,13 @@ export default () => {
         class: "h-full w-full p-8 bg-white shadow-md",
       },
     },
+
     onUpdate({ editor }) {
-      console.log(">Content change!", editor.getHTML());
-    },
-    onBlur({ editor, event }) {
-      console.log("onblur");
+      onContentChange(editor.getMarkdown());
     },
 
-    content: `
-    <h2>
-    Hi there,
-    </h2>
-    <p>
-    this is a <em>basic</em> example of <strong>Tiptap</strong>. Sure, there are all kind of basic text styles you’d probably expect from a text editor. But wait until you see the lists:
-    </p>
-    <ul>
-    <li>
-    That’s a bullet list with one …
-    </li>
-    <li>
-    … or two list items.
-                     </li>
-    </ul>
-    <p>
-    Isn’t that great? And all of that is editable. But wait, there’s more. Let’s try a code block:
-    </p>
-    <pre><code class="language-css">body {
-      display: none;
-}</code></pre>
-<p>
-  I know, I know, this is impressive. It’s only the tip of the iceberg though. Give it a try and click a little bit around. Don’t forget to check the other examples too.
-</p>
-<blockquote>
-  Wow, that’s amazing. Good work, boy! 👏
-  <br />
-  — Mom
-</blockquote>
-    `,
+    content,
+    contentType: 'markdown', // parse initial content as Markdown
   });
 
   if (!editor) {

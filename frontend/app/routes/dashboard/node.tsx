@@ -1,9 +1,10 @@
 import type { Route } from "./+types/story";
 import { useCallback } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useFetcher } from "react-router";
 
 import { userContext } from "~/context";
 import { StoryApiRepository } from "~/.server/story";
+import { NodeApiRepository } from "~/.server/node";
 import GetAllStoriesUseCase from "~/core/get-all-stories-use-case";
 import DocumentTree from "~/components/tree";
 import Editor from "~/components/editor";
@@ -12,20 +13,44 @@ import { Container, Message } from "~/ui";
 
 export async function loader({ context, params }: Route.LoaderArgs) {
   const session = context.get(userContext);
-
   const storyRepository = new StoryApiRepository(session?.token ?? "");
+  const nodeRepository = new NodeApiRepository(session?.token ?? "");
   const getAllStoriesUseCase = new GetAllStoriesUseCase(storyRepository);
   try {
     const stories = await getAllStoriesUseCase.execute();
-    return { stories, storyId: params.id };
+    const node = await nodeRepository.getById(params.id, params.node);
+
+    return { stories, storyId: params.id, node, nodeId: params.node };
   } catch (error) {
+    console.error(error);
     return { error: "Failed to get stories" };
   }
 }
 
-export default function Story({ loaderData }: Route.ComponentProps) {
-  const { error, stories, storyId } = loaderData;
+export async function action({ context, request }: Route.ActionArgs) {
+  const formData = await request.formData();
+  const storyId = formData.get("storyId") as string;
+  const nodeId = formData.get("nodeId") as string;
+  const text = formData.get("text") as string;
+
+  const session = context.get(userContext);
+  const nodeRepository = new NodeApiRepository(session?.token ?? "");
+
+  try {
+    let node = await nodeRepository.getById(storyId, nodeId);
+    node = await nodeRepository.update(storyId, { ...node, text });
+    return { node };
+  } catch (error) {
+    console.error(error);
+    return { error: "Failed to save" };
+  }
+}
+
+export default function Story({ actionData, loaderData }: Route.ComponentProps) {
+  const { error, stories, storyId, node, nodeId } = loaderData;
   const navigate = useNavigate();
+
+  const fetcher = useFetcher();
 
   const onStoryChange = useCallback(
     (id: string) => {
@@ -33,6 +58,15 @@ export default function Story({ loaderData }: Route.ComponentProps) {
     },
     [navigate]
   );
+
+  const onContentChange = useCallback(
+    (text: string) => {
+      fetcher.submit(
+        {storyId, nodeId, text},
+        { method: "post" }
+      );
+    }
+  )
 
   if (error || !stories || !storyId) {
     return (
@@ -58,6 +92,9 @@ export default function Story({ loaderData }: Route.ComponentProps) {
       </aside>
 
       <section className="h-full px-6 mx-auto container">
+        <Editor
+          content={node.text}
+          onContentChange={onContentChange} />
       </section>
     </article>
   );
