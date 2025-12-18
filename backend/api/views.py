@@ -7,6 +7,9 @@ from rest_framework.permissions import IsAuthenticated
 
 from .analysis import TextAnalyzer
 
+import tempfile
+import convert_markdown
+from django.http import HttpResponse
 
 def result_project_nodes(project):
     nodes = project.projectnode_set.all().order_by('order')
@@ -92,6 +95,48 @@ class ProjectsDetailView(APIView):
         project.delete()
 
         return Response("OK", status=200)
+
+def append_node_children(result, parent):
+    nodegroups = parent.node_group_parent.all().order_by('order')
+    for ng in nodegroups:
+        node = ng.child
+        if node.get_node_type() == "scene":
+            result.append(node.as_child().text)
+        elif node.get_node_type() == "node-group":
+            append_node_children(result, node.as_child())
+
+class ProjectExportView(APIView):
+    def get(self, request, pk=None):
+        try:
+            project = Project.objects.get(id=pk)
+        except Project.DoesNotExist:
+            return Response("Not found", status=404)
+
+        content = []
+        projectnodes = project.projectnode_set.all().order_by('order')
+        for pn in projectnodes:
+            node = pn.node
+            if node.get_node_type() == "scene":
+                content.append(node.as_child().text)
+            elif node.get_node_type() == "node-group":
+                append_node_children(content, node.as_child())
+
+        output_txt = "\n\n".join(content)
+
+        print(output_txt)
+        output = convert_markdown.to(
+            markdown=output_txt,
+            style='style',
+            format='docx'  # default: 'pdf', 'docx', 'pptx', 'html'
+        )
+
+        with tempfile.NamedTemporaryFile(delete_on_close=False) as fp:
+            fp.write(output)
+            fp.close()
+            file_pointer = open(fp.name, mode='rb')
+            response = HttpResponse(file_pointer, content_type='application/msword')
+            response['Content-Disposition'] = 'attachment; filename=export.docx'
+            return response
 
 class NodesListView(APIView):
     permission_classes = [IsAuthenticated]
@@ -302,17 +347,21 @@ class NodeAnalysisView(APIView):
         except Node.DoesNotExist:
             return Response("Not found node", status=404)
 
-        analyzer = TextAnalyzer(node.text)
+        try:
+            analyzer = TextAnalyzer(node.text)
 
-        result = {}
+            result = {}
 
-        if 'word-count' in request.query_params:
-            result['word-count'] = analyzer.count_words()
+            if 'word-count' in request.query_params:
+                result['word-count'] = analyzer.count_words()
 
-        if 'frequency' in request.query_params:
-            result['frequency'] = analyzer.frequencies()
+            if 'frequency' in request.query_params:
+                result['frequency'] = analyzer.frequencies()
 
-        if 'word-tags' in request.query_params:
-            result['word-tags'] = analyzer.word_tags()
-        
+            if 'word-tags' in request.query_params:
+                result['word-tags'] = analyzer.word_tags()
+
+        except:
+            pass
+
         return Response(result)

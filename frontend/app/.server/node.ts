@@ -51,7 +51,7 @@ export class NodeApiRepository implements NodeRepository {
           Authorization: `Token ${this.token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(node),
+        body: JSON.stringify({type: node.nodeType, ...node}),
       }
     );
 

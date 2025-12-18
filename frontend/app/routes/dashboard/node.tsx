@@ -83,7 +83,7 @@ export default function Story({
 
   return (
     <div className="flex gap-4">
-      <div className="container">
+      <div className="w-4xl">
         <Editor
           content={node.text}
           onContentChange={onContentChange} />
