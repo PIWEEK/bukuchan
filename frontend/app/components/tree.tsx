@@ -5,6 +5,7 @@ import {
   useDragAndDrop,
   Collection,
   useTreeData,
+  Button as AriaButton,
 } from "react-aria-components";
 
 import {
@@ -19,98 +20,16 @@ import {
 
 import Button from "~/ui/button";
 
-// FIXME: this should be somewhere else
-type StoryNode = {
-  id: string;
-  title: string;
-  nodeType: "group" | "scene" | "lore-entity";
-  children?: StoryNode[];
-};
-
-function CollapsibleItem({
-  id,
-  title,
-  children,
-  icon: Icon,
-}: {
-  id: string;
-  title: string;
-  icon: React.ElementType;
-  children?: React.ReactNode;
-}) {
-  return (
-    <TreeItem
-      textValue={title}
-      className="flex gap-1 flex-row items-center py-1"
-      id={id}
-    >
-      <TreeItemContent>
-        {({ isExpanded, hasChildItems, level }) => (
-          <>
-            <Button
-              slot="drag"
-              icon={GripVertical}
-              variant="ghost"
-              style={{
-                marginInlineStart: `calc(${(level - 1) * 5} * var(--spacing)`,
-              }}
-              className="px-0"
-            />
-            <Button
-              variant="ghost"
-              slot="chevron"
-              icon={isExpanded ? ChevronDown : ChevronRight}
-              className={`px-0`}
-              isDisabled={!hasChildItems}
-            />
-            <Icon size={16} className="text-current" aria-label="Group" />
-            {title}
-          </>
-        )}
-      </TreeItemContent>
-      {children}
-    </TreeItem>
-  );
-}
-
-export function TerminalItem({
-  id,
-  title,
-  icon: Icon,
-}: {
-  id: string;
-  title: string;
-  icon: React.ElementType;
-}) {
-  return (
-    <TreeItem
-      textValue={title}
-      className="flex gap-1 flex-row items-center py-1"
-      id={id}
-    >
-      <TreeItemContent>
-        {({ level }) => (
-          <>
-            <Button
-              slot="drag"
-              icon={GripVertical}
-              variant="ghost"
-              className="px-0"
-              style={{
-                marginInlineStart: `calc(${(level - 1) * 5} * var(--spacing)`,
-              }}
-            />
-            <Icon size={16} className="text-current" aria-label="Group" />
-            {title}
-          </>
-        )}
-      </TreeItemContent>
-    </TreeItem>
-  );
+function iconForNodeType(nodeType: string) {
+  return {
+    group: Circle,
+    scene: Clapperboard,
+    "lore-entity": Box,
+  }[nodeType as "group" | "scene" | "lore-entity"];
 }
 
 export default function StoryTree({ className }: { className?: string }) {
-  const tree = useTreeData<StoryNode>({
+  const tree = useTreeData({
     initialItems: [
       {
         id: "001",
@@ -152,11 +71,26 @@ export default function StoryTree({ className }: { className?: string }) {
   });
 
   const { dragAndDropHooks } = useDragAndDrop({
-    getItems: (keys, items: typeof tree.items) =>
+    getItems: (_, items: typeof tree.items) =>
       items.map((item) => ({ "text/plain": item.value.title })),
     onMove: (e: any) => {
-      console.log(e);
-      console.log("drop position", e.target.dropPosition);
+      if (e.target.dropPosition === "before") {
+        tree.moveBefore(e.target.key, e.keys);
+      } else if (e.target.dropPosition === "after") {
+        tree.moveAfter(e.target.key, e.keys);
+      } else if (e.target.dropPosition === "on") {
+        // Move items to become children of the target
+        let targetNode = tree.getItem(e.target.key);
+        if (targetNode && targetNode.value.nodeType === "group") {
+          let targetIndex = targetNode.children
+            ? targetNode.children.length
+            : 0;
+          let keyArray = Array.from(e.keys) as (string | number)[];
+          for (let i = 0; i < keyArray.length; i++) {
+            tree.move(keyArray[i], e.target.key, targetIndex + i);
+          }
+        }
+      }
     },
   });
 
@@ -172,31 +106,48 @@ export default function StoryTree({ className }: { className?: string }) {
         items={tree.items}
         defaultExpandedKeys={["001", "003"]}
       >
-        {function renderItem(
-          item: (typeof tree.items)[number]
-        ): React.ReactNode {
-          if (item.value.nodeType === "group") {
-            return (
-              <CollapsibleItem
-                id={item.value.id}
-                title={item.value.title}
-                icon={Circle}
-              >
-                <Collection items={item.children ?? []}>
-                  {renderItem}
-                </Collection>
-              </CollapsibleItem>
-            );
-          }
-
-          const icon = item.value.nodeType === "scene" ? Clapperboard : Box;
-
+        {function renderItem(item): React.ReactNode {
+          const Icon = iconForNodeType(item.value.nodeType);
           return (
-            <TerminalItem
-              id={item.value.id}
-              title={item.value.title}
-              icon={icon}
-            />
+            <TreeItem
+              textValue={item.value.title}
+              className="flex gap-1 flex-row items-center py-1"
+              key={item.value.id}
+            >
+              <TreeItemContent>
+                {({ level, isExpanded, hasChildItems }) => (
+                  <>
+                    <Button
+                      slot="drag"
+                      icon={GripVertical}
+                      variant="ghost"
+                      style={{
+                        marginInlineStart: `calc(${(level - 1) * 5} * var(--spacing)`,
+                      }}
+                      className="px-0"
+                    />
+                    {item.children?.length ? (
+                      <Button
+                        variant="ghost"
+                        slot="chevron"
+                        icon={isExpanded ? ChevronDown : ChevronRight}
+                        className={`px-0`}
+                        isDisabled={!hasChildItems}
+                      />
+                    ) : null}
+                    <Icon
+                      size={16}
+                      className="text-current"
+                      aria-label={item.value.nodeType}
+                    />
+                    {item.value.title}
+                  </>
+                )}
+              </TreeItemContent>
+              {item.children && (
+                <Collection items={item.children}>{renderItem}</Collection>
+              )}
+            </TreeItem>
           );
         }}
       </Tree>
