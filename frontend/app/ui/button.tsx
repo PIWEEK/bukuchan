@@ -38,17 +38,17 @@ export default function Button({
   const { bgColor, textColor } = variants[variant];
   const navigate = useNavigate();
 
-  const onPress = slot
-    ? undefined
-    : useCallback(
-        (event: PressEvent) => {
-          if (to) {
-            navigate(to);
-          }
-          other.onPress?.(event);
-        },
-        [to, navigate, other]
-      );
+  const onPressHandler = useCallback(
+    (event: PressEvent) => {
+      if (to) {
+        navigate(to);
+      }
+      other.onPress?.(event);
+    },
+    [to, navigate, other]
+  );
+
+  const onPress = slot ? undefined : onPressHandler;
 
   return (
     <AriaButton
