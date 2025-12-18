@@ -100,7 +100,10 @@ export default function StoryTree({ className }: { className?: string }) {
         Add node
       </Button>
       <Tree
-        className="pt-2"
+        className="pt-2
+          [&_.react-aria-DropIndicator[data-drop-target]]:outline-1
+        [&_.react-aria-DropIndicator[data-drop-target]]:outline-light-or
+          [&_.react-aria-DropIndicator[data-drop-target]]:ml-[calc(${(level - 1) * 5} * var(--spacing)]"
         aria-label="Story Tree"
         dragAndDropHooks={dragAndDropHooks}
         items={tree.items}
@@ -111,7 +114,7 @@ export default function StoryTree({ className }: { className?: string }) {
           return (
             <TreeItem
               textValue={item.value.title}
-              className="flex gap-1 flex-row items-center py-1"
+              className="flex gap-1 flex-row items-center py-1 data-drop-target:outline-2 data-drop-target:outline-light-or rounded-md data-drop-target:outline-offset-1"
               key={item.value.id}
             >
               <TreeItemContent>
