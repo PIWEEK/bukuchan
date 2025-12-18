@@ -5,7 +5,6 @@ import {
   useDragAndDrop,
   Collection,
   useTreeData,
-  Button as AriaButton,
 } from "react-aria-components";
 
 import {
@@ -18,56 +17,37 @@ import {
   Box,
 } from "lucide-react";
 
+import type { NodeType } from "~/core/node";
+
 import Button from "~/ui/button";
 
-function iconForNodeType(nodeType: string) {
-  return {
-    group: Circle,
+function iconForNodeType(nodeType: NodeType) {
+  const iconMap: Record<NodeType, typeof Circle> = {
+    "node-group": Circle,
     scene: Clapperboard,
-    "lore-entity": Box,
-  }[nodeType as "group" | "scene" | "lore-entity"];
+    loreentity: Box,
+  };
+  return iconMap[nodeType] ?? Box;
 }
 
-export default function StoryTree({ className }: { className?: string }) {
+export interface StoryNode {
+  id: string;
+  title: string;
+  nodeType: NodeType;
+  children: StoryNode[];
+}
+
+export default function StoryTree({
+  className,
+  nodes,
+  defaultSelected,
+}: {
+  className?: string;
+  nodes: StoryNode[];
+  defaultSelected?: string;
+}) {
   const tree = useTreeData({
-    initialItems: [
-      {
-        id: "001",
-        title: "Draft",
-        nodeType: "group",
-        children: [
-          {
-            id: "004",
-            title: "Act I",
-            nodeType: "group",
-            children: [
-              {
-                id: "002",
-                title: "Catalyst",
-                nodeType: "scene",
-              },
-            ],
-          },
-        ],
-      },
-      {
-        id: "003",
-        title: "Characters",
-        nodeType: "group",
-        children: [
-          {
-            id: "005",
-            title: "Bilbo",
-            nodeType: "lore-entity",
-          },
-          {
-            id: "006",
-            title: "Gandalf",
-            nodeType: "lore-entity",
-          },
-        ],
-      },
-    ],
+    initialItems: nodes,
   });
 
   const { dragAndDropHooks } = useDragAndDrop({
@@ -81,7 +61,7 @@ export default function StoryTree({ className }: { className?: string }) {
       } else if (e.target.dropPosition === "on") {
         // Move items to become children of the target
         let targetNode = tree.getItem(e.target.key);
-        if (targetNode && targetNode.value.nodeType === "group") {
+        if (targetNode && targetNode.value.nodeType === "node-group") {
           let targetIndex = targetNode.children
             ? targetNode.children.length
             : 0;
@@ -107,14 +87,18 @@ export default function StoryTree({ className }: { className?: string }) {
         aria-label="Story Tree"
         dragAndDropHooks={dragAndDropHooks}
         items={tree.items}
-        defaultExpandedKeys={["001", "003"]}
+        defaultExpandedKeys={defaultSelected ? [defaultSelected] : undefined}
       >
         {function renderItem(item): React.ReactNode {
-          const Icon = iconForNodeType(item.value.nodeType);
+          const Icon = iconForNodeType(item.value.nodeType as NodeType);
+          const textColorClass =
+            item.value.id === defaultSelected
+              ? "text-light-or"
+              : "text-current";
           return (
             <TreeItem
               textValue={item.value.title}
-              className="flex gap-1 flex-row items-center py-1 data-drop-target:outline-2 data-drop-target:outline-light-or rounded-md data-drop-target:outline-offset-1"
+              className={`${textColorClass} flex gap-1 flex-row items-center py-1 data-drop-target:outline-2 data-drop-target:outline-light-or rounded-md data-drop-target:outline-offset-1`}
               key={item.value.id}
             >
               <TreeItemContent>
